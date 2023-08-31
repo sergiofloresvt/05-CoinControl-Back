@@ -10,6 +10,7 @@ import tup.coincontrol.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    
     @Autowired
     private final UserRepository userRepository;
 
