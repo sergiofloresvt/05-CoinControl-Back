@@ -12,6 +12,8 @@ public interface GastoRepository extends JpaRepository <Gasto, Long>{
 
     List<Gasto> findByCategory(Category category);
 
+    List<Gasto> findByCategory_Id(Long categoryId);
+    
     Optional<Gasto> findExpenseById(Long id);
     static Gasto orElseThrow(Object object) {
         return null;

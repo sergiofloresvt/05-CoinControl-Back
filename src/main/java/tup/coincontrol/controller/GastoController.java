@@ -82,17 +82,29 @@ public class GastoController {
       return ResponseEntity.ok(gasto);
     }
     
-    @GetMapping("/find/ByCategory/")
-        public ResponseEntity<List<Gasto>> getGastosByCategory(@RequestBody Long categoryId){
-            Category category = categoryService.findCategoryById(categoryId);
+    // @GetMapping("/find/ByCategory/{categoryId}")
+    //     public ResponseEntity<List<Gasto>> getGastosByCategory(@RequestBody Long categoryId){
+    //         Category category = categoryService.findCategoryById(categoryId);
 
-            if(category != null) {
-                List<Gasto> gastos = gastoService.getGastosByCategory(category);
-                return new ResponseEntity<>(gastos, HttpStatus.OK);
+    //         if(category != null) {
+    //             List<Gasto> gastos = gastoService.getGastosByCategory(category);
+    //             return new ResponseEntity<>(gastos, HttpStatus.OK);
 
-            }else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+    //         }else {
+    //             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    //         }
+    //     }
+        /*Metodo 2 funcionando. All category de gastos*/
+        @GetMapping("/find/categotyId")
+        public List<Long> getCategoryId(){
+            return gastoService.getAllCaegoryId();
+        }
+        
+        /*Trae los gastos con la misma category */
+        @GetMapping("/find/bycategory/{categoryId}")
+        public List<Gasto> getGastoByCategory(
+            @PathVariable Long categoryId){
+            return gastoService.findGastoByCategoryId(categoryId);
         }
     }
 
