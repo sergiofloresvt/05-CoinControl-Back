@@ -1,5 +1,6 @@
 package tup.coincontrol.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -13,30 +14,59 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import tup.coincontrol.model.Category;
 import tup.coincontrol.model.Gasto;
-
+import tup.coincontrol.repository.CategoryRepository;
+import tup.coincontrol.service.CategoryService;
 import tup.coincontrol.service.GastoService;
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080"})
 @RestController
 @RequestMapping("/gastos")
 public class GastoController {
     private final GastoService gastoService;
-
+    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     @Autowired
-    public GastoController(GastoService gastoService) {
-        
+    public GastoController(GastoService gastoService,
+                        CategoryRepository categoryRepository,
+                        CategoryService categoryService) {
         this.gastoService = gastoService;
+        this.categoryRepository =categoryRepository;
+        this.categoryService = categoryService;
     }
     
-        @PostMapping("/crear")
-    public void createUser(@RequestBody Gasto gasto)
-    {
-        gastoService.crearGasto(gasto);
+    // @PostMapping("/add")
+    // public void createUser(@RequestBody Gasto gasto)
+    // {
+    //     gastoService.crearGasto(gasto);
+    // }
+    // @PostMapping("/add")
+    // public ResponseEntity<Gasto> addGasto(
+    //     @RequestParam Long monto,
+    //     @RequestParam String descripcion,
+    //     @RequestParam String date,
+    //     @RequestParam Long category_id
+    // ){
+        
+    //     Gasto newGasto = gastoService.addGasto(null, monto, descripcion, null, category_id);
+    //     return ResponseEntity.ok(newGasto);
+    // }
+    @PostMapping("/add")
+    public ResponseEntity<Gasto> addGastotoCategory(
+        @RequestBody Gasto gasto,
+        @RequestParam Long categoryId
+    ){
+        Category category = categoryRepository.findById(categoryId).orElse(null);
+        gasto.setCategory(category);
+        Gasto newGasto = gastoService.addGasto(gasto);
+        return new ResponseEntity<>(newGasto, HttpStatus.CREATED);
     }
-    /*GET ALL */
+    
+
+    /*GET ALL EXPENSE */
     @GetMapping("/all")
     public ResponseEntity<List<Gasto>>getAllGasto() {
         
@@ -51,5 +81,18 @@ public class GastoController {
       Gasto gasto = gastoService.updateExpense(id, updatedExpense);
       return ResponseEntity.ok(gasto);
     }
-  
-}
+    
+    @GetMapping("/find/ByCategory/")
+        public ResponseEntity<List<Gasto>> getGastosByCategory(@RequestBody Long categoryId){
+            Category category = categoryService.findCategoryById(categoryId);
+
+            if(category != null) {
+                List<Gasto> gastos = gastoService.getGastosByCategory(category);
+                return new ResponseEntity<>(gastos, HttpStatus.OK);
+
+            }else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+    }
+
